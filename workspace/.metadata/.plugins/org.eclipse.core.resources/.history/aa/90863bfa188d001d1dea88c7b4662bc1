@@ -1,0 +1,13 @@
+
+public class Imager {
+	private double value;
+
+	  public Imager(double value) {
+	    this.value = value;
+	  }
+
+	  public double getValue() {
+	    return value;
+	  }
+
+}

@@ -1,0 +1,186 @@
+import java.awt.EventQueue;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.wb.swt.SWTResourceManager;
+
+import javax.swing.JLabel;
+import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.FlowLayout;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormSpecs;
+import com.jgoodies.forms.layout.RowSpec;
+import java.awt.Font;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.SwingConstants;
+import net.miginfocom.swing.MigLayout;
+import java.awt.BorderLayout;
+import javax.swing.border.Border;
+import javax.swing.BorderFactory;
+
+
+public class test extends JFrame {
+
+	private JPanel contentPane;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					test frame = new test();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public test() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 953, 642);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+			contentPane.setLayout(new MigLayout("", "[256px][176px][][][][][][][][][][][][31.00][][][][][]", "[90px][90px][][256px][][][][][][]"));
+			
+			JLabel ISELbl = new JLabel();
+			ISELbl.setHorizontalAlignment(SwingConstants.CENTER);
+			ISELbl.setFont(new Font("Calibri", ISELbl.getFont().getStyle() | Font.BOLD, ISELbl.getFont().getSize() + 2));
+			//ISELbl.setBounds(63, 30, 171, 24);
+			ISELbl.setText("Image Search Engine");
+			contentPane.add(ISELbl, "cell 0 0,grow");
+			
+			JLabel resultsLbl = new JLabel();
+			resultsLbl.setHorizontalAlignment(SwingConstants.CENTER);
+			resultsLbl.setFont(new Font("Calibri", resultsLbl.getFont().getStyle() | Font.BOLD, resultsLbl.getFont().getSize() + 2));
+			//resultsLbl.setBounds(542, 30, 60, 24);
+			resultsLbl.setText("Results");
+			contentPane.add(resultsLbl, "cell 17 0,grow");
+			
+			JButton btnBrowse = new JButton();
+			//btnBrowse.setBounds(107, 84, 82, 32);
+			btnBrowse.setText("Browse...");
+			contentPane.add(btnBrowse, "cell 0 1,alignx center");
+			
+			
+			//String file = "C:\\Users\\acreg\\Desktop\\final year\\Project\\images\\Crowds\\Crowds001.jpg";
+			//
+			//ImageIcon pic = new ImageIcon(file.toString());
+			////lblNewLabel_1.setIcon(pic);
+								
+				
+			Border loweredbevel = BorderFactory.createLoweredBevelBorder();
+			
+			JLabel lblNewLabel_1 = new JLabel("New label");
+			lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
+			//lblNewLabel_1.setBounds(27, 142, 256, 256);
+			lblNewLabel_1.setText("waiting...");
+			contentPane.add(lblNewLabel_1, "cell 0 2 1 2,grow");
+			lblNewLabel_1.setBorder(loweredbevel);
+			
+			
+			JButton btnSearch = new JButton();
+			//btnSearch.setBounds(128, 422, 61, 32);
+			btnSearch.setText("Search");
+			contentPane.add(btnSearch, "cell 0 8,alignx center,growy");
+			
+			JButton btnClear = new JButton();
+			//btnClear.setBounds(531, 422, 87, 32);
+			btnClear.setText("Clear data");
+			contentPane.add(btnClear, "cell 17 8,grow");
+		
+		
+			btnBrowse.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					
+				    JFileChooser chooser = new JFileChooser();
+				    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+				        "JPG & GIF Images", "jpg", "gif");
+				    chooser.setFileFilter(filter);
+				    int returnVal = chooser.showOpenDialog(null);
+				    if(returnVal == JFileChooser.APPROVE_OPTION) {
+				    	File file = new File(chooser.getSelectedFile().getAbsolutePath());
+
+						ImageIcon pic = new ImageIcon(file.toString());
+						ImageIcon imageIcon = new ImageIcon(pic.getImage().getScaledInstance(256, 256, Image.SCALE_DEFAULT));
+						lblNewLabel_1.setIcon(imageIcon);
+						lblNewLabel_1.setText("");
+						
+										
+						
+				    }					
+					
+				}
+			});
+			btnClear.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					lblNewLabel_1.setText("waiting...");
+					lblNewLabel_1.setIcon(null);
+				}
+			});
+			
+			
+			
+			
+		    // File representing the folder that you select using a FileChooser
+		    static final File dir = new File("PATH_TO_YOUR_DIRECTORY");
+
+		    // array of supported extensions (use a List if you prefer)
+		    static final String[] EXTENSIONS = new String[]{
+		        "gif", "png", "bmp" // and other formats you need
+		    };
+		    // filter to identify images based on their extensions
+		    static final FilenameFilter IMAGE_FILTER = new FilenameFilter() {
+
+		        @Override
+		        public boolean accept(final File dir, final String name) {
+		            for (final String ext : EXTENSIONS) {
+		                if (name.endsWith("." + ext)) {
+		                    return (true);
+		                }
+		            }
+		            return (false);
+		        }
+		    };
+
+			
+			
+	}
+
+}
+
+
+
