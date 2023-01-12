@@ -33,7 +33,6 @@ public class images {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
 		// File representing the folder that you select using a FileChooser
-		//final File dir = new File("C:\\Users\\acreg\\Desktop\\final year\\Project\\workspace\\GUI\\res");
 		final File dir = new File("res");
 
 
@@ -93,7 +92,7 @@ public class images {
 			//method 1 *Chi-square*
 			//method 2 *Intersection*
 			//method 3 *Bhattacharyya*			
-			int method = 2;
+			int method = 0;
 			
 			
 			//for(int i=0; i<allResults.length;i++) {
