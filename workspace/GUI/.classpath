@@ -24,10 +24,5 @@
 	<classpathentry kind="lib" path="C:/Users/acreg/.p2/pool/plugins/org.eclipse.ui.forms_3.11.500.v20221024-2137.jar" sourcepath="C:/Users/acreg/.p2/pool/plugins/org.eclipse.ui.forms_3.11.500.v20221024-2137.jar"/>
 	<classpathentry kind="lib" path="jgoodies-forms-1.8.0.jar" sourcepath="jgoodies-forms-1.8.0-sources.jar"/>
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
-	<classpathentry kind="lib" path="libs/opencv-470.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="GUI/libs/x64"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="output" path=""/>
 </classpath>

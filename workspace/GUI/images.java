@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -8,37 +9,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.swt.widgets.Item;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfFloat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.Range;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
-
 
 public class images {
 
-	public static ArrayList<Image> details(Icon icon, String queryImgStr) {
+	public static ArrayList<Image> details(Icon icon, String queryImgStr) throws IOException {
 
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-
-		// File representing the folder that you select using a FileChooser
+		final File qIm = new File(queryImgStr);
 		final File dir = new File("res");
 
-
-		// array of supported extensions (use a List if you prefer)
+		// array of supported extensions
 		final String[] EXTENSIONS = new String[]{
-				"jpg" // and other formats you need
+				"jpg" 
 		};
 		// filter to identify images based on their extensions
 		final FilenameFilter IMAGE_FILTER = new FilenameFilter() {
@@ -57,22 +45,55 @@ public class images {
 		ArrayList<String> imgsDir = new ArrayList<String>();
 		ArrayList<Image> unproImgs = new ArrayList<Image>();
 		ArrayList<Image> proImgs = new ArrayList<Image>();
-		ArrayList<Mat> unproImgsMat = new ArrayList<Mat>();
+	
+		BufferedImage qImage = ImageIO.read(qIm);
+		
+	    int qWidth = qImage.getWidth();
+        int qHeight = qImage.getHeight();
+        float[][][] qhsvImage = new float[qHeight][qWidth][3];
 
-		Mat matQueryImg = Imgcodecs.imread(queryImgStr);
+        for (int y = 0; y < qHeight; y++) {
+            for (int x = 0; x < qWidth; x++) {
+                int rgb = qImage.getRGB(x, y);
+                int r = (rgb >> 16) & 0xff;
+                int g = (rgb >> 8) & 0xff;
+                int b = rgb & 0xff;
 
+                float[] hsv = RGBtoHSV(r, g, b);
+                qhsvImage[y][x][0] = hsv[0];
+                qhsvImage[y][x][1] = hsv[1];
+                qhsvImage[y][x][2] = hsv[2];
+            }
+        }
+	    		
+		ArrayList<float[][][]> imageMatrices = new ArrayList<>();
 		if (dir.isDirectory()) { // make sure it's a directory
 			for (final File f : dir.listFiles(IMAGE_FILTER)) {
-				BufferedImage img = null;
-				Mat matIm = null;
+		
+				try {								
+					BufferedImage image = ImageIO.read(f);
+					
+			        int width = image.getWidth();
+			        int height = image.getHeight();
+			        float[][][] hsvImage = new float[height][width][3];
 
-				try {
-					img = ImageIO.read(f);
-					matIm = Imgcodecs.imread(f.toString());
+			        for (int y = 0; y < height; y++) {
+			            for (int x = 0; x < width; x++) {
+			                int rgb = image.getRGB(x, y);
+			                int r = (rgb >> 16) & 0xff;
+			                int g = (rgb >> 8) & 0xff;
+			                int b = rgb & 0xff;
 
+			                float[] hsv = RGBtoHSV(r, g, b);
+			                hsvImage[y][x][0] = hsv[0];
+			                hsvImage[y][x][1] = hsv[1];
+			                hsvImage[y][x][2] = hsv[2];
+			            }
+			        }
+													
+				    unproImgs.add(image);
+				    imageMatrices.add(hsvImage);				
 					imgsDir.add(f.toString());
-					unproImgs.add(img);
-					unproImgsMat.add(matIm);
 					System.out.println("image: " + f.getName());
 
 				} catch (final IOException e) {
@@ -80,25 +101,22 @@ public class images {
 				}		
 			}
 
-			//ArrayList<Double> meth1 = new ArrayList<Double>();
 			ArrayList<Double>[] allResults = (ArrayList<Double>[])new ArrayList[4];	
 			ArrayList<Image>[] fproImgs = (ArrayList<Image>[])new ArrayList[4];
+					
+			allResults = new compareHist().run(imageMatrices, qhsvImage);		
 
-			//meth1 = new CompareHist().run(imgsDir, unproImgsMat, matQueryImg);
-			allResults = new CompareHist().run(imgsDir, unproImgsMat, matQueryImg);		
-
-
+			//TO RUN FASTER MOVE METHOD ABOVE ALLRESULTS AND SEND IT AS A 
+			//PARAMETER SO IT DOESNT HAVE TO CALCULATE ALL METHOD RESULTS
+			
+			
 			//method 0 *Correlation*
 			//method 1 *Chi-square*
 			//method 2 *Intersection*
 			//method 3 *Bhattacharyya*			
-			int method = 0;
-			
-			
-			//for(int i=0; i<allResults.length;i++) {
+			int method = 3;
 
 			fproImgs[method] = unproImgs;
-
 
 			Map<Double, Image> map = new HashMap<Double, Image>();
 			for(int y = 0; y < allResults[method].size(); y++) {
@@ -112,16 +130,10 @@ public class images {
 				fproImgs[method].add(map.get(allResults[method].get(z)));
 			}
 
-
 			// print sorted list
 			for (double s : allResults[method]){
 				System.out.println(s);
 			}
-
-
-			//}
-
-
 
 			//taking top 10 images for meth2 and meth4
 			if (method==1||method==3) {
@@ -131,15 +143,46 @@ public class images {
 			}
 			//taking top 10 images for meth1 and meth3
 			if (method==0||method==2) {
-				for (int i = fproImgs[method].size()-1; i > fproImgs[method].size() -11; i--) {	
+				for (int i = fproImgs[method].size()-1; i > fproImgs[method].size() -16; i--) {	
 					proImgs.add(fproImgs[method].get(i));
 				}
 			}
-
 		}
-
 		return proImgs;
 
 	}
+		
+	private static float[] RGBtoHSV(int r, int g, int b) {
+        float h, s, v;
 
+        float rf = r / 255.0f;
+        float gf = g / 255.0f;
+        float bf = b / 255.0f;
+
+        float max = Math.max(Math.max(rf, gf), bf);
+        float min = Math.min(Math.min(rf, gf), bf);
+
+        v = max;
+
+        float delta = max - min;
+
+        if (max == 0 || delta == 0) {
+            h = 0;
+            s = 0;
+        } else {
+            s = delta / max;
+            if (rf == max) {
+                h = (gf - bf) / delta;
+            } else if (gf == max) {
+                h = 2 + (bf - rf) / delta;
+            } else {
+                h = 4 + (rf - gf) / delta;
+            }
+            h *= 60;
+            if (h < 0) {
+                h += 360;
+            }
+        }
+        return new float[]{h, s, v};
+    }	
 }
